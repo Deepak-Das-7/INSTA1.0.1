@@ -22,7 +22,7 @@ const HomeScreen = () => {
     const fetchPosts = async () => {
         setRefreshing(true);
         try {
-            const response = await axios.get(`http://192.168.31.161:8000/posts`);
+            const response = await axios.get(`http://192.168.31.86:8000/posts`);
             setPosts(response.data);
         } catch (error) {
             console.error('Error fetching posts:', error);
@@ -33,7 +33,7 @@ const HomeScreen = () => {
     const fetchStories = async () => {
         setRefreshing(true);
         try {
-            const response = await axios.get(`http://192.168.31.161:8000/story`);
+            const response = await axios.get(`http://192.168.31.86:8000/story`);
             setStories(response.data);
         } catch (error) {
             console.error('Error fetching stories:', error);

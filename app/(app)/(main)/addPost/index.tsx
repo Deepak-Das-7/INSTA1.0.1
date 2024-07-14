@@ -23,7 +23,7 @@ const addPost = () => {
                 return;
             }
 
-            const response = await fetch('http://192.168.31.161:8000/posts/add', {
+            const response = await fetch('http://192.168.31.86:8000/posts/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

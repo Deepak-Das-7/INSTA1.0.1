@@ -19,7 +19,7 @@ const Story = ({ item }) => {
 
     const getOwnerDetails = async () => {
         try {
-            const response = await axios.get(`http://192.168.31.161:8000/profile/${item.owner_id}`);
+            const response = await axios.get(`http://192.168.31.86:8000/profile/${item.owner_id}`);
             const userData = response.data;
             setUsername(userData.username);
             setUserImageUrl(userData.profilePicture);
@@ -41,7 +41,7 @@ const Story = ({ item }) => {
 
     const liked = async () => {
         try {
-            const response = await axios.post('http://192.168.31.161:8000/posts/liked', {
+            const response = await axios.post('http://192.168.31.86:8000/posts/liked', {
                 post_id: item._id,
                 senderId: userId.user_id,
             });
@@ -54,7 +54,7 @@ const Story = ({ item }) => {
     const handleSubmit = async () => {
         console.log('Submitted comment:', commentText);
         try {
-            const response = await axios.post('http://192.168.31.161:8000/posts/comment', {
+            const response = await axios.post('http://192.168.31.86:8000/posts/comment', {
                 post_id: item._id,
                 senderId: userId.user_id,
                 text: commentText
@@ -75,7 +75,7 @@ const Story = ({ item }) => {
                 setDescription("");
                 return;
             }
-            const response = await fetch('http://192.168.31.161:8000/story/add', {
+            const response = await fetch('http://192.168.31.86:8000/story/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
