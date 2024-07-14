@@ -1,0 +1,36 @@
+{
+    "__v": "0",
+    "_id": "65f86464266f958378c06977",
+    "createdAt": "2024-03-18T15:57:24.005Z",
+    "email": "forth@gmail.com",
+    "friends": "65f869f39fae0d2adcd9ce35,65f92cacce866c2a0ca1d635,65f92e14ce866c2a0ca1d78d,665eb827f1abc5d4346f2fb5,666000325adc5b70604fb2e9",
+    "lastMessage": "[object Object]",
+    "profilePicture": "https://picsum.photos/800",
+    "request_received": "",
+    "request_sent": "665eb99bf1abc5d4346f3275",
+    "updatedAt": "2024-06-25T09:27:18.714Z",
+    "user_id": "65f86463266f958378c06974",
+    "username": "fourth day "
+}
+ {
+    "__v": 0,
+    "_id": "665eb828f1abc5d4346f2fb8",
+    "createdAt": "2024-06-04T06:46:00.151Z",
+    "email": "apple@gmail.com",
+    "friends": [
+        "666000325adc5b70604fb2e9",
+        "65f86463266f958378c06974"
+    ],
+    "profilePicture": "https://picsum.photos/660",
+    "request_received": [],
+    "request_sent": [
+        "65f869f39fae0d2adcd9ce35",
+        "65f92cacce866c2a0ca1d635",
+        "666000a15adc5b70604fb386",
+        "65f92e14ce866c2a0ca1d78d",
+        "665eb99bf1abc5d4346f3275"
+    ],
+    "updatedAt": "2024-06-25T09:27:16.906Z",
+    "user_id": "665eb827f1abc5d4346f2fb5",
+    "username": "Apple Das"
+}
