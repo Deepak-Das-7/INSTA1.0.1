@@ -32,7 +32,7 @@ export default function Auth() {
             password: password,
             profilePicture: "https://picsum.photos/600/300"
         };
-        axios.post("http://192.168.31.161:8000/auth/register", userData)
+        axios.post("http://192.168.31.86:8000/auth/register", userData)
             .then((response) => {
                 console.log(response.data.message);
                 Alert.alert("Registration Successful", "You have been registered successfully");
@@ -60,7 +60,7 @@ export default function Auth() {
             return;
         }
 
-        axios.post("http://192.168.31.161:8000/auth/login", userData)
+        axios.post("http://192.168.31.86:8000/auth/login", userData)
             .then((response) => {
                 setUserId(response.data.data);
                 setLoading(false);
@@ -80,7 +80,7 @@ export default function Auth() {
     };
 
     const selectUser = () => {
-        axios.get("http://192.168.31.161:8000/user/allUser")
+        axios.get("http://192.168.31.86:8000/user/allUser")
             .then((response) => {
                 setAllUsers(response.data);
                 setSelect(!select);

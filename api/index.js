@@ -2,23 +2,22 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const story = require('./routes/story');
-const posts = require('./routes/posts');
-const profile = require('./routes/profile');
-const request = require('./routes/request');
-const messages = require('./routes/messages');
-const auth = require('./routes/auth');
-const user = require('./routes/user');
+const http = require('http');
+const socketIo = require('socket.io');
+const socketEvents = require('./socket');
 
 const app = express();
-app.use(cors());
-const port = 8000;
-const mongoUri = "mongodb+srv://DeepakDas:ashutosh82@cluster0.ll96sxh.mongodb.net/Instagram?retryWrites=true&w=majority";
-// const mongoUri = "mongodb://localhost:27017/test";
+const server = http.createServer(app);
+const io = socketIo(server);
 
+const port = 8000;
+const mongoUri = "mongodb://localhost:27017/test";
+
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// MongoDB connection
 mongoose
   .connect(mongoUri)
   .then(() => {
@@ -28,28 +27,21 @@ mongoose
     console.log("Error connecting to MongoDB:", error);
   });
 
-app.listen(port, () => {
-  console.log("Server is running on port", port);
-});
+// Attach socket.io instance to req.app
+app.io = io;
 
-// Route error handling
-const routes = [
-  { path: '/story', route: story },
-  { path: '/posts', route: posts },
-  { path: '/profile', route: profile },
-  { path: '/request', route: request },
-  { path: '/messages', route: messages },
-  { path: '/auth', route: auth },
-  { path: '/user', route: user },
-];
+// Initialize socket.io events
+socketEvents(io);
 
-routes.forEach(({ path, route }) => {
-  app.use(path, route);
-  app.use(path, (req, res, next) => {
-    const error = new Error(`Not Found - ${req.originalUrl}`);
-    error.status = 404;
-    next(error);
-  });
+// API routes setup
+const routes = require('./routes');
+app.use('/', routes);
+
+// Error handling middleware
+app.use((req, res, next) => {
+  const error = new Error(`Not Found - ${req.originalUrl}`);
+  error.status = 404;
+  next(error);
 });
 
 app.use((error, req, res, next) => {
@@ -59,4 +51,8 @@ app.use((error, req, res, next) => {
       message: error.message
     }
   });
+});
+
+server.listen(port, () => {
+  console.log("Server is running on port", port);
 });
