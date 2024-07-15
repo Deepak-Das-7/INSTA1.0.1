@@ -16,7 +16,7 @@ const index = () => {
 
     const getUsers = async () => {
         setRefreshing(true);
-        await axios.get(`http://192.168.31.86:8000/profile/allOthers/${userId.user_id}`)
+        await axios.get(`http://192.168.31.161:8000/profile/allOthers/${userId.user_id}`)
             .then((response) => {
                 setUsers(response.data);
             })
@@ -45,7 +45,7 @@ const index = () => {
         const request = buttonText;
         console.log(request, "request sent to", item.username)
 
-        const response = await fetch(`http://192.168.31.86:8000/request?senderId=${userId.user_id}&receiverId=${item.user_id}&kisme=${request}`, {
+        const response = await fetch(`http://192.168.31.161:8000/request?senderId=${userId.user_id}&receiverId=${item.user_id}&kisme=${request}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

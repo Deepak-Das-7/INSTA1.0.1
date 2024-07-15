@@ -26,7 +26,7 @@ const Story = ({ item }) => {
 
     const getOwnerDetails = async () => {
         try {
-            const response = await axios.get(`http://192.168.31.86:8000/profile/${item.owner_id}`);
+            const response = await axios.get(`http://192.168.31.161:8000/profile/${item.owner_id}`);
             const userData = response.data;
             setUsername(userData.username);
             setUserImageUrl(userData.profilePicture);
@@ -37,7 +37,7 @@ const Story = ({ item }) => {
 
     const likeCount = async () => {
         try {
-            const response = await axios.get(`http://192.168.31.86:8000/story/${item._id}`);
+            const response = await axios.get(`http://192.168.31.161:8000/story/${item._id}`);
             const userData = response.data;
             console.log(userData);
             await setSeenUsers(userData.reacted_user);
@@ -61,7 +61,7 @@ const Story = ({ item }) => {
         await likeCount();
         if (seeStoryVisible) {
             try {
-                const response = await axios.post('http://192.168.31.86:8000/story/seen', {
+                const response = await axios.post('http://192.168.31.161:8000/story/seen', {
                     story_id: item._id,
                     reactor_id: userId.user_id,
                 });
@@ -75,7 +75,7 @@ const Story = ({ item }) => {
 
     const liked = async () => {
         try {
-            const response = await axios.post('http://192.168.31.86:8000/story/liked', {
+            const response = await axios.post('http://192.168.31.161:8000/story/liked', {
                 story_id: item._id,
                 reactor_id: userId.user_id,
             });
@@ -177,7 +177,7 @@ const Story = ({ item }) => {
                         }}>
                             <TouchableOpacity onPress={liked} >
                                 <AntDesign name="heart" size={35} color="red" />
-                                <Text style={{textAlign:"center",fontWeight:"bold"}}>
+                                <Text style={{ textAlign: "center", fontWeight: "bold" }}>
                                     {numberOfLikes}
                                 </Text>
                             </TouchableOpacity>

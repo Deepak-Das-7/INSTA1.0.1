@@ -22,7 +22,7 @@ const Friends = ({ item, handlePressProfile, handlePress }) => {
 
     const updateButtonStatus = async () => {
         try {
-            const response = await axios.get(`http://192.168.31.86:8000/profile/${you.user_id}`);
+            const response = await axios.get(`http://192.168.31.161:8000/profile/${you.user_id}`);
             const userData = response.data;
             if (userData.request_received.includes(userId.user_id)) {
                 setButtonText("Request Sent");

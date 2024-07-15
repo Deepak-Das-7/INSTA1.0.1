@@ -104,7 +104,7 @@ const Chat = () => {
                 return;
             }
 
-            const response = await axios.get('http://192.168.31.86:8000/messages/conversation', {
+            const response = await axios.get('http://192.168.31.161:8000/messages/conversation', {
                 params: {
                     sender_id: userId.user_id,
                     receipent_id: user.user_id,
@@ -134,7 +134,7 @@ const Chat = () => {
                 return;
             }
 
-            const response = await axios.post('http://192.168.31.86:8000/messages/send', {
+            const response = await axios.post('http://192.168.31.161:8000/messages/send', {
                 sender_id: userId.user_id,
                 receipent_id: user.user_id,
                 text: message
@@ -158,7 +158,7 @@ const Chat = () => {
 
     const markAllMessagesAsViewed = async () => {
         try {
-            const response = await axios.get('http://192.168.31.86:8000/messages/seen', {
+            const response = await axios.get('http://192.168.31.161:8000/messages/seen', {
                 params: {
                     sender_id: user.user_id,
                     receipent_id: userId.user_id,

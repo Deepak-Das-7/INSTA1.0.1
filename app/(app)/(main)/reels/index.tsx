@@ -13,7 +13,7 @@ const index = () => {
     useEffect(() => {
         const fetchFriends = async () => {
             try {
-                const response = await axios.get(`http://192.168.31.86:8000/profile/friends/${userId.user_id}`);
+                const response = await axios.get(`http://192.168.31.161:8000/profile/friends/${userId.user_id}`);
                 setUsers(response.data);
             } catch (error) {
                 console.error('Error fetching friends:', error);

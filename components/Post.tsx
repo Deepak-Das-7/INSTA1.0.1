@@ -27,7 +27,7 @@ const InstagramPost = ({ item }) => {
 
     const updateStatus = async () => {
         try {
-            const response = await axios.get(`http://192.168.31.86:8000/posts/${item._id}`);
+            const response = await axios.get(`http://192.168.31.161:8000/posts/${item._id}`);
             const userData = response.data;
             setComments(userData.comments);
             setLikes(userData.liked_user_id.length);
@@ -40,7 +40,7 @@ const InstagramPost = ({ item }) => {
     };
     const getOwnerDetails = async () => {
         try {
-            const response = await axios.get(`http://192.168.31.86:8000/profile/${item.owner_id}`);
+            const response = await axios.get(`http://192.168.31.161:8000/profile/${item.owner_id}`);
             const userData = response.data;
             setUsername(userData.username);
             setUserImageUrl(userData.profilePicture);
@@ -61,7 +61,7 @@ const InstagramPost = ({ item }) => {
 
     const liked = async () => {
         try {
-            const response = await axios.post('http://192.168.31.86:8000/posts/liked', {
+            const response = await axios.post('http://192.168.31.161:8000/posts/liked', {
                 post_id: item._id,
                 senderId: userId.user_id,
             });
@@ -75,7 +75,7 @@ const InstagramPost = ({ item }) => {
 
     const checkLikePresence = async () => {
         try {
-            const response = await fetch('http://192.168.31.86:8000/posts/likedPresence', { // Replace with your server URL
+            const response = await fetch('http://192.168.31.161:8000/posts/likedPresence', { // Replace with your server URL
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ const InstagramPost = ({ item }) => {
         console.log('Submitted comment:', commentText);
         if (commentText) {
             try {
-                const response = await axios.post('http://192.168.31.86:8000/posts/comment', {
+                const response = await axios.post('http://192.168.31.161:8000/posts/comment', {
                     post_id: item._id,
                     senderId: userId.user_id,
                     text: commentText
@@ -143,7 +143,7 @@ const InstagramPost = ({ item }) => {
     const renderComment = ({ item }) => {
 
         const timeAgo = getTimeAgo(new Date(item.created_at));
-        
+
         return (
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginVertical: 10 }}>
                 <Image source={{ uri: item.sender_photo || 'https://picsum.photos/4000' }} style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }} />
@@ -176,7 +176,7 @@ const InstagramPost = ({ item }) => {
                     onPress: async () => {
                         console.log("Deleting the image");
                         try {
-                            const response = await axios.post('http://192.168.31.86:8000/posts/delete', {
+                            const response = await axios.post('http://192.168.31.161:8000/posts/delete', {
                                 post_id: item._id,
                             });
                             console.log('Deleted successfully:', response.data);

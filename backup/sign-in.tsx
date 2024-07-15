@@ -33,7 +33,7 @@ export default function Auth() {
             password: password,
             profilePicture: "https://picsum.photos/600/300"
         };
-        axios.post("http://192.168.31.86:8000/auth/register", userData)
+        axios.post("http://192.168.31.161:8000/auth/register", userData)
             .then((response) => {
                 console.log(response.data.message)
                 Alert.alert(
@@ -68,7 +68,7 @@ export default function Auth() {
             return;
         }
 
-        axios.post("http://192.168.31.86:8000/auth/login", userData)
+        axios.post("http://192.168.31.161:8000/auth/login", userData)
             .then((response) => {
                 setUserId(response.data.data)
                 setLoading(false);

@@ -32,7 +32,7 @@ export default function Auth() {
             password: password,
             profilePicture: "https://picsum.photos/600/300"
         };
-        axios.post("http://192.168.31.86:8000/auth/register", userData)
+        axios.post("http://192.168.31.161:8000/auth/register", userData)
             .then((response) => {
                 console.log(response.data.message);
                 Alert.alert("Registration Successful", "You have been registered successfully");
@@ -60,7 +60,7 @@ export default function Auth() {
             return;
         }
 
-        axios.post("http://192.168.31.86:8000/auth/login", userData)
+        axios.post("http://192.168.31.161:8000/auth/login", userData)
             .then((response) => {
                 setUserId(response.data.data);
                 setLoading(false);
@@ -80,7 +80,7 @@ export default function Auth() {
     };
 
     const selectUser = () => {
-        axios.get("http://192.168.31.86:8000/user/allUser")
+        axios.get("http://192.168.31.161:8000/user/allUser")
             .then((response) => {
                 setAllUsers(response.data);
                 setSelect(!select);
@@ -109,9 +109,9 @@ export default function Auth() {
                 }}>
                     <Image source={{ uri: item.profile.profilePicture }} style={{ width: 50, height: 50, borderRadius: 25 }} />
                     <View style={{ flex: 1, marginLeft: 10, justifyContent: 'center' }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between',gap:10,marginHorizontal:5 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10, marginHorizontal: 5 }}>
                             <Text style={{ fontSize: 15, fontWeight: '500', }}>{item.username}</Text>
-                            <Text style={{ fontSize: 11, color: '#888',verticalAlign:"middle" }}>{formatDate(item.profile.createdAt)}</Text>
+                            <Text style={{ fontSize: 11, color: '#888', verticalAlign: "middle" }}>{formatDate(item.profile.createdAt)}</Text>
                         </View>
                         <Text style={{ fontSize: 14, color: '#888', marginTop: 2, }}>{item.profile.friends.length} Friends</Text>
                     </View>
@@ -282,9 +282,9 @@ export default function Auth() {
                         position: "absolute",
                         top: 0,
                         zIndex: 1,
-                        alignSelf:"flex-end",
+                        alignSelf: "flex-end",
                     }}
-                    onPress={() => setSelect(!select)}
+                        onPress={() => setSelect(!select)}
                     >
                         <MaterialIcons name="cancel" size={36} color="black" />
                     </TouchableOpacity>

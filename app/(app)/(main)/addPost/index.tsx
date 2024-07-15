@@ -24,7 +24,7 @@ const addPost = () => {
                 return;
             }
 
-            const response = await fetch('http://192.168.31.86:8000/posts/add', {
+            const response = await fetch('http://192.168.31.161:8000/posts/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const addPost = () => {
                         placeholder={"Description..."}
                         placeholderTextColor="gray"
                         multiline={true}
-                    numberOfLines={4}
+                        numberOfLines={4}
                     />
                     <TextInput
                         style={styles.input2}
@@ -135,12 +135,12 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.3,
         shadowRadius: 2,
-      },
-      buttonText: {
+    },
+    buttonText: {
         fontSize: 18,
         fontWeight: 'bold',
         color: 'white',
-      }
+    }
 });
 
 export default addPost;
