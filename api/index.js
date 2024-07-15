@@ -13,7 +13,8 @@ const user = require('./routes/user');
 const app = express();
 app.use(cors());
 const port = 8000;
-const mongoUri = "mongodb+srv://DeepakDas:ashutosh82@cluster0.ll96sxh.mongodb.net/Instagram?retryWrites=true&w=majority";
+// const mongoUri = "mongodb+srv://DeepakDas:ashutosh82@cluster0.ll96sxh.mongodb.net/Instagram?retryWrites=true&w=majority";
+const mongoUri = "mongodb://localhost:27017/test";
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

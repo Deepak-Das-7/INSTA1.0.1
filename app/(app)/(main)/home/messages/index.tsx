@@ -3,6 +3,7 @@ import { FlatList, TouchableOpacity, View, Image, StyleSheet, Text } from 'react
 import axios from 'axios';
 import { useSession } from '../../../../../UserContext';
 import { router } from 'expo-router';
+import { formatTime } from '../../../../../calculator/time';
 
 const ChatList = () => {
     const [users, setUsers] = useState([]);
@@ -56,29 +57,6 @@ const ChatList = () => {
         });
     };
 
-    function formatTime(createdAt) {
-        const now = new Date();
-        const created = new Date(createdAt);
-
-        const isToday = now.toDateString() === created.toDateString();
-
-        if (isToday) {
-            const hours = created.getHours();
-            const minutes = created.getMinutes();
-            const seconds = created.getSeconds();
-            const ampm = hours >= 12 ? 'pm' : 'am';
-            const formattedHours = hours % 12 || 12;
-            const formattedMinutes = minutes.toString().padStart(2, '0');
-            const formattedSeconds = seconds.toString().padStart(2, '0');
-
-            return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
-        } else {
-            const day = created.getDate().toString().padStart(2, '0');
-            const month = (created.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based
-            const year = created.getFullYear();
-            return `${day}/${month}/${year}`;
-        }
-    }
 
     const renderItem = ({ item }) => (
         <TouchableOpacity onPress={() => handlePressMessage(item)}>

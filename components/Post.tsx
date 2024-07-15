@@ -6,6 +6,7 @@ import axios from 'axios';
 import { formatDistanceToNow, differenceInSeconds, differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns';
 import { useSession } from '../UserContext';
 import logoDas from '../assets/test.jpg';
+import { router } from 'expo-router';
 
 const InstagramPost = ({ item }) => {
 
@@ -142,6 +143,7 @@ const InstagramPost = ({ item }) => {
     const renderComment = ({ item }) => {
 
         const timeAgo = getTimeAgo(new Date(item.created_at));
+        
         return (
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginVertical: 10 }}>
                 <Image source={{ uri: item.sender_photo || 'https://picsum.photos/4000' }} style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }} />
@@ -179,6 +181,7 @@ const InstagramPost = ({ item }) => {
                             });
                             console.log('Deleted successfully:', response.data);
                             Alert.alert("Deleted successfully", response.data.is_delete);
+                            router.replace("/");
                         } catch (error) {
                             console.error('Error deleting post:', error);
                             Alert.alert("Error deleting post");

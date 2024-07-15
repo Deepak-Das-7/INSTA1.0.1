@@ -5,7 +5,7 @@ const Logo = () => {
     return (
         <View style={{ alignItems: "center", }}>
             <Image
-                style={{ width: 200, height: 200 }}
+                style={{ width: 150, height: 150 }}
                 source={require('../assets/logoDas.png')}
             />
         </View>

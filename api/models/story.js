@@ -5,11 +5,12 @@ const storySchema = new mongoose.Schema({
     owner_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     photo: { type: String, required: true },
     description: { type: String },
-    liked_user_id: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    reaction: [{
-        text: { type: String },
+    address: { type: String },
+    reacted_user: [{
+        timestamps: { type: Date, default: Date.now },
+        liked: { type: Boolean, default: false },
         sender_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
-    }]
+    }],
 }, { timestamps: true });
 
 const Story = mongoose.model('Story', storySchema);

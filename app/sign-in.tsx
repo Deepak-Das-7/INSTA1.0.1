@@ -1,10 +1,12 @@
 import { useSession } from '../UserContext';
 import React, { useState } from 'react';
-import { Alert, StyleSheet, View, StatusBar, Text, TextInput, TouchableOpacity, Pressable, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
+import { Alert, StyleSheet, View, StatusBar, Text, TextInput, TouchableOpacity, Pressable, KeyboardAvoidingView, Platform, FlatList, Image } from 'react-native';
 import Logo from '../components/Logo';
 import { router } from 'expo-router';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
+import { Modal } from 'react-native';
+import { formatDate } from '../calculator/dateFormat';
 
 export default function Auth() {
     const [name, setName] = useState('');
@@ -81,6 +83,7 @@ export default function Auth() {
         axios.get("http://192.168.31.86:8000/user/allUser")
             .then((response) => {
                 setAllUsers(response.data);
+                setSelect(!select);
             })
             .catch((error) => {
                 Alert.alert("Fetching Fail", "An error occurred during Fetching");
@@ -91,14 +94,31 @@ export default function Auth() {
     const handleUserPress = (user) => {
         setEmail(user.email);
         setPassword(user.password);
+        setSelect(!select);
     };
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity onPress={() => handleUserPress(item)} style={{}}>
-            <Text style={{ fontSize: 15, fontWeight: '500' }}>{item.username}</Text>
-            <Text style={{ fontSize: 10 }}>{item.email}</Text>
-        </TouchableOpacity>
-    );
+    const renderItem = ({ item }) => {
+        console.log(item);
+        return (
+            <View>
+                <TouchableOpacity onPress={() => handleUserPress(item)} style={{
+                    flexDirection: 'row',
+                    padding: 10,
+                    borderBottomWidth: 1,
+                    borderBottomColor: '#ddd'
+                }}>
+                    <Image source={{ uri: item.profile.profilePicture }} style={{ width: 50, height: 50, borderRadius: 25 }} />
+                    <View style={{ flex: 1, marginLeft: 10, justifyContent: 'center' }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between',gap:10,marginHorizontal:5 }}>
+                            <Text style={{ fontSize: 15, fontWeight: '500', }}>{item.username}</Text>
+                            <Text style={{ fontSize: 11, color: '#888',verticalAlign:"middle" }}>{formatDate(item.profile.createdAt)}</Text>
+                        </View>
+                        <Text style={{ fontSize: 14, color: '#888', marginTop: 2, }}>{item.profile.friends.length} Friends</Text>
+                    </View>
+                </TouchableOpacity>
+            </View >
+        );
+    };
 
     const handleInputChange = (text) => {
         if (text.includes(' ')) {
@@ -251,13 +271,30 @@ export default function Auth() {
                 >
                     <Text style={styles.selectUserButtonText}>Select user</Text>
                 </TouchableOpacity>
-                <View style={{ marginTop: 10 }}>
+
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={select}
+                    onRequestClose={() => setSelect(!select)}
+                >
+                    <TouchableOpacity style={{
+                        position: "absolute",
+                        top: 0,
+                        zIndex: 1,
+                        alignSelf:"flex-end",
+                    }}
+                    onPress={() => setSelect(!select)}
+                    >
+                        <MaterialIcons name="cancel" size={36} color="black" />
+                    </TouchableOpacity>
                     <FlatList
                         data={allUsers}
                         renderItem={renderItem}
                         keyExtractor={item => item._id}
+                        style={{ margin: 15, backgroundColor: "white", borderRadius: 10, padding: 10 }}
                     />
-                </View>
+                </Modal>
             </View>
         </KeyboardAvoidingView>
     );
@@ -282,7 +319,7 @@ const styles = StyleSheet.create({
     txt: {
         color: "blue",
         textAlign: "center",
-        marginTop: 15,
+        marginTop: 10,
         fontWeight: "500",
     },
     label: {

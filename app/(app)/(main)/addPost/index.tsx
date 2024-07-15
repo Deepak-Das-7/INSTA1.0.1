@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, Image, SafeAreaView } from 'react-native';
 import { useSession } from '../../../../UserContext';
 import { router } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const addPost = () => {
     const { userId, setUserId } = useSession();
     const [description, setDescription] = useState('');
-    const [address, setAddress] = useState('Jharkhand,825318');
+    const [address, setAddress] = useState('');
     const [photoUrl, setPhotoUrl] = useState(`https://picsum.photos/150`);
 
     function getRandomPhotoUrl() {
@@ -55,36 +56,39 @@ const addPost = () => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.inputContainer}>
-                <View>
+                <View style={{ flex: 1, alignItems: "center" }}>
                     <Text style={{ color: "red" }}>{photoUrl}</Text>
-                    <Image source={{ uri: photoUrl }} style={{ width: 200, height: 200 }} />
-                    <TouchableOpacity onPress={getRandomPhotoUrl} style={{ backgroundColor: "gray", marginVertical: 5, borderRadius: 5, padding: 3 }}>
-                        <Text style={{ color: "black" }}>Change Photo</Text>
+                    <Image source={{ uri: photoUrl }} style={{ width: 160, height: 160, borderRadius: 10, borderWidth: 1, borderColor: "yellow" }} />
+                    <TouchableOpacity onPress={getRandomPhotoUrl}>
+                        <MaterialIcons name="change-circle" size={30} color="white" />
                     </TouchableOpacity>
                 </View>
-                <View>
+                <View style={{ flex: 1 }}>
                     <TextInput
-                        style={styles.input}
+                        style={styles.input1}
                         value={description}
                         onChangeText={(text) => setDescription(text)}
-                        placeholder={"ADD THE DESCRIPTION FOR YOUR POST"}
+                        placeholder={"Description..."}
                         placeholderTextColor="gray"
+                        multiline={true}
+                    numberOfLines={4}
                     />
                     <TextInput
-                        style={styles.input}
+                        style={styles.input2}
                         value={address}
                         onChangeText={(text) => setAddress(text)}
                         placeholder={"Adddress"}
                         placeholderTextColor="gray"
+                        multiline={true}
                     />
-                    <TouchableOpacity onPress={addPost} style={{ borderRadius: 5, backgroundColor: "blue", justifyContent: "center", alignItems: "center", paddingVertical: 5, paddingHorizontal: 10, marginTop: 20 }}>
-                        <Text style={{ fontSize: 20, fontWeight: "bold", color: "white" }}>
-                            Share
-                        </Text>
+                    <TouchableOpacity
+                        onPress={addPost}
+                        style={styles.button}
+                        activeOpacity={0.7}
+                    >
+                        <Text style={styles.buttonText}>Share</Text>
                     </TouchableOpacity>
                 </View>
-
-
             </View>
         </SafeAreaView>
     );
@@ -94,21 +98,49 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'black',
-        paddingTop: 10,
+        padding: 5,
     },
     inputContainer: {
-        alignItems: 'center',
         flexDirection: "row",
+        gap: 5,
+        justifyContent: "space-between"
     },
-    input: {
-        borderRadius: 15,
+    input1: {
         paddingHorizontal: 15,
         paddingVertical: 10,
         marginTop: 20,
-        fontSize: 15,
-        color: 'white',
-        backgroundColor: "#222222",
+        fontSize: 14,
+        color: 'black',
+        backgroundColor: "white",
+        height: 150,
     },
+    input2: {
+        borderRadius: 2,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        marginTop: 10,
+        fontSize: 14,
+        color: 'black',
+        backgroundColor: "white",
+    },
+    button: {
+        borderRadius: 8,
+        backgroundColor: '#007BFF',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        marginTop: 10,
+        elevation: 3,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+      },
+      buttonText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: 'white',
+      }
 });
 
 export default addPost;
