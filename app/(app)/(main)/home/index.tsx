@@ -9,6 +9,7 @@ import Story from '../../../../components/Story';
 import { MaterialIcons } from '@expo/vector-icons';
 import { TextInput } from 'react-native';
 import { Alert } from 'react-native';
+import env from '../../../../config';
 
 
 const HomeScreen = () => {
@@ -34,7 +35,7 @@ const HomeScreen = () => {
     const fetchPosts = async () => {
         setRefreshing(true);
         try {
-            const response = await axios.get(`http://192.168.31.86:8000/posts`);
+            const response = await axios.get(`${env.API_BASE_URL}/posts`);
             setPosts(response.data);
         } catch (error) {
             console.error('Error fetching posts:', error);
@@ -46,7 +47,7 @@ const HomeScreen = () => {
     const fetchStories = async () => {
         setRefreshing(true);
         try {
-            const response = await axios.get(`http://192.168.31.86:8000/story`);
+            const response = await axios.get(`${env.API_BASE_URL}/story`);
             if (!response.data) {
                 console.log("No stories");
                 return;
@@ -115,7 +116,7 @@ const HomeScreen = () => {
                 return;
             }
 
-            const response = await fetch('http://192.168.31.86:8000/story/add', {
+            const response = await fetch(`${env.API_BASE_URL}/story/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

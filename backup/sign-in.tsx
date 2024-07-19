@@ -5,6 +5,7 @@ import Logo from "../components/Logo"
 import { router } from 'expo-router'
 import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
+import env from '../config';
 
 
 export default function Auth() {
@@ -33,7 +34,7 @@ export default function Auth() {
             password: password,
             profilePicture: "https://picsum.photos/600/300"
         };
-        axios.post("http://192.168.31.86:8000/auth/register", userData)
+        axios.post(`${env.API_BASE_URL}/auth/register`, userData)
             .then((response) => {
                 console.log(response.data.message)
                 Alert.alert(
@@ -68,7 +69,7 @@ export default function Auth() {
             return;
         }
 
-        axios.post("http://192.168.31.86:8000/auth/login", userData)
+        axios.post(`${env.API_BASE_URL}/auth/login`, userData)
             .then((response) => {
                 setUserId(response.data.data)
                 setLoading(false);

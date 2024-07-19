@@ -6,7 +6,8 @@ import axios from 'axios';
 import MessageInput from '../../../../../components/MessageInput';
 import MessageGroup from '../../../../../components/MessageGroup';
 import io from 'socket.io-client';
-import sanitizeHtml from 'sanitize-html'; // Import sanitize-html library
+import sanitizeHtml from 'sanitize-html';
+import env from '../../../../../config';
 
 const Chat = () => {
     const user = useLocalSearchParams();
@@ -17,18 +18,18 @@ const Chat = () => {
     const flatListRef = useRef(null);
 
     useEffect(() => {
-        // Establish socket connection on component mount
-        socket.current = io('http://192.168.31.86:8000');
+        // Initialize socket connection
+        socket.current = io(env.API_BASE_URL);
 
-        // Event listener for receiving messages
+        // Listen for incoming messages
         socket.current.on('receiveMessage', handleReceiveMessage);
 
-        // Fetch initial conversation and mark messages as viewed
+        // Fetch existing conversation and mark all messages as viewed
         fetchConversation();
         markAllMessagesAsViewed();
 
-        // Cleanup function: disconnect socket when component unmounts
         return () => {
+            // Clean up socket connection on component unmount
             if (socket.current) {
                 socket.current.disconnect();
             }
@@ -36,15 +37,13 @@ const Chat = () => {
     }, []);
 
     useEffect(() => {
-        // Scroll to end of chat when conversation updates
+        // Scroll to the end when conversation updates
         goToEnd("Conversation updated");
     }, [conversation]);
 
-    // Function to handle receiving a new message from socket
     const handleReceiveMessage = (newMessage) => {
         if (newMessage.sender_id === user.user_id || newMessage.receipent_id === user.user_id) {
             setConversation((prevConversation) => {
-                // Check if the new message already exists in any group
                 let messageExists = false;
                 const updatedConversation = prevConversation.map((group) => {
                     if (group.msgs.some((msg) => msg._id === newMessage._id)) {
@@ -58,7 +57,6 @@ const Chat = () => {
                     }
                 });
 
-                // If the message is new, add it to the latest group or create a new group
                 if (!messageExists) {
                     const latestGroup = updatedConversation[updatedConversation.length - 1];
                     if (latestGroup && latestGroup.date === new Date(newMessage.createdAt).toISOString().split('T')[0]) {
@@ -77,17 +75,15 @@ const Chat = () => {
         }
     };
 
-    // Function to scroll to end of chat
     const goToEnd = (message) => {
         console.log(message);
         if (flatListRef.current) {
             setTimeout(() => {
                 flatListRef.current.scrollToEnd({ animated: true });
-            }, 100); // Adjust timeout if needed
+            }, 100);
         }
     };
 
-    // Function to group messages by date
     const groupMessagesByDate = (messages) => {
         const grouped = {};
         messages.forEach((msg) => {
@@ -100,7 +96,6 @@ const Chat = () => {
         return Object.entries(grouped).map(([date, msgs]) => ({ date, msgs }));
     };
 
-    // Function to fetch initial conversation
     const fetchConversation = async () => {
         try {
             if (!user._id || !userId.user_id) {
@@ -108,7 +103,7 @@ const Chat = () => {
                 return;
             }
 
-            const response = await axios.get('http://192.168.31.86:8000/messages/conversation', {
+            const response = await axios.get(`${env.API_BASE_URL}/messages/conversation`, {
                 params: {
                     sender_id: userId.user_id,
                     receipent_id: user.user_id,
@@ -129,54 +124,50 @@ const Chat = () => {
         }
     };
 
-// Function to send a new message
-const sendMessage = async () => {
-    try {
-        if (!message) {
-            setMessage("Please type first, then try to send.");
-            await new Promise(resolve => setTimeout(resolve, 500));
-            setMessage("");
-            return;
-        }
+    const sendMessage = async () => {
+        try {
+            if (!message) {
+                setMessage("Please type first, then try to send.");
+                await new Promise(resolve => setTimeout(resolve, 500));
+                setMessage("");
+                return;
+            }
 
-        const createdAt = new Date().toISOString(); // Ensure createdAt is correctly formatted
-        console.log('Sending message with createdAt:', createdAt);
+            const createdAt = new Date().toISOString();
+            console.log('Sending message with createdAt:', createdAt);
 
-        const newMessage = {
-            sender_id: userId.user_id,
-            receipent_id: user.user_id,
-            text: sanitizeInput(message), // Sanitize message input
-            createdAt: createdAt,
-        };
+            const newMessage = {
+                sender_id: userId.user_id,
+                receipent_id: user.user_id,
+                text: sanitizeInput(message),
+                createdAt: createdAt,
+            };
 
-        const response = await axios.post('http://192.168.31.86:8000/messages/send', newMessage);
-        if (response.status === 201) {
-            console.log(`
+            const response = await axios.post(`${env.API_BASE_URL}/messages/send`, newMessage);
+            if (response.status === 201) {
+                console.log(`
                 Message sent successfully!
                 From: ${userId.username}
                 To: ${user.username}
                 Message: ${message}
             `);
-            setMessage("");
-            socket.current.emit('sendMessage', newMessage); // Emit the message to the server
-        } else {
-            console.error('Failed to send message');
+                setMessage("");
+                socket.current.emit('sendMessage', newMessage);
+            } else {
+                console.error('Failed to send message');
+            }
+        } catch (error) {
+            if (error instanceof RangeError && error.message === 'Date value out of bounds') {
+                console.error('Date value out of bounds error:', error);
+            } else {
+                console.error('Error sending message:', error);
+            }
         }
-    } catch (error) {
-        if (error instanceof RangeError && error.message === 'Date value out of bounds') {
-            console.error('Date value out of bounds error:', error);
-            // Additional error handling specific to date issues
-        } else {
-            console.error('Error sending message:', error);
-        }
-    }
-};
+    };
 
-
-    // Function to mark all messages as viewed
     const markAllMessagesAsViewed = async () => {
         try {
-            const response = await axios.get('http://192.168.31.86:8000/messages/seen', {
+            const response = await axios.get(`${env.API_BASE_URL}/messages/seen`, {
                 params: {
                     sender_id: user.user_id,
                     receipent_id: userId.user_id,
@@ -192,7 +183,6 @@ const sendMessage = async () => {
         }
     };
 
-    // Function to sanitize HTML inputs using sanitize-html library
     const sanitizeInput = (input) => {
         return sanitizeHtml(input, {
             allowedTags: [],

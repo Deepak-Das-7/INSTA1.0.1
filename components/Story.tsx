@@ -6,6 +6,7 @@ import { useSession } from '../UserContext';
 import { Modal } from 'react-native';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { FlatList } from 'react-native';
+import env from '../config';
 
 
 const Story = ({ item }) => {
@@ -26,7 +27,7 @@ const Story = ({ item }) => {
 
     const getOwnerDetails = async () => {
         try {
-            const response = await axios.get(`http://192.168.31.86:8000/profile/${item.owner_id}`);
+            const response = await axios.get(`${env.API_BASE_URL}/profile/${item.owner_id}`);
             const userData = response.data;
             setUsername(userData.username);
             setUserImageUrl(userData.profilePicture);
@@ -37,7 +38,7 @@ const Story = ({ item }) => {
 
     const likeCount = async () => {
         try {
-            const response = await axios.get(`http://192.168.31.86:8000/story/${item._id}`);
+            const response = await axios.get(`${env.API_BASE_URL}/story/${item._id}`);
             const userData = response.data;
             console.log(userData);
             await setSeenUsers(userData.reacted_user);
@@ -61,7 +62,7 @@ const Story = ({ item }) => {
         await likeCount();
         if (seeStoryVisible) {
             try {
-                const response = await axios.post('http://192.168.31.86:8000/story/seen', {
+                const response = await axios.post(`${env.API_BASE_URL}/story/seen`, {
                     story_id: item._id,
                     reactor_id: userId.user_id,
                 });
@@ -75,7 +76,7 @@ const Story = ({ item }) => {
 
     const liked = async () => {
         try {
-            const response = await axios.post('http://192.168.31.86:8000/story/liked', {
+            const response = await axios.post(`${env.API_BASE_URL}/story/liked`, {
                 story_id: item._id,
                 reactor_id: userId.user_id,
             });

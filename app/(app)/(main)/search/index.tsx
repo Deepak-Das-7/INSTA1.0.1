@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useSession } from '../../../../UserContext';
 import logoDas from '../../../../assets/logoDas.png';
 import Friends from '../../../../components/Friends';
+import env from '../../../../config';
 
 const index = () => {
     const { userId, setUserId } = useSession();
@@ -16,7 +17,7 @@ const index = () => {
 
     const getUsers = async () => {
         setRefreshing(true);
-        await axios.get(`http://192.168.31.86:8000/profile/allOthers/${userId.user_id}`)
+        await axios.get(`${env.API_BASE_URL}/profile/allOthers/${userId.user_id}`)
             .then((response) => {
                 setUsers(response.data);
             })
@@ -45,7 +46,7 @@ const index = () => {
         const request = buttonText;
         console.log(request, "request sent to", item.username)
 
-        const response = await fetch(`http://192.168.31.86:8000/request?senderId=${userId.user_id}&receiverId=${item.user_id}&kisme=${request}`, {
+        const response = await fetch(`${env.API_BASE_URL}/request?senderId=${userId.user_id}&receiverId=${item.user_id}&kisme=${request}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -2,10 +2,11 @@
 
 # dependencies
 node_modules/
+#file
+config.js
 
 # Expo
 .expo/
-dist/
 web-build/
 
 # Native
