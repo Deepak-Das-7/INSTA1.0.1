@@ -98,7 +98,6 @@ export default function Auth() {
     };
 
     const renderItem = ({ item }) => {
-        console.log(item);
         return (
             <View>
                 <TouchableOpacity onPress={() => handleUserPress(item)} style={{

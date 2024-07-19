@@ -47,11 +47,13 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.11",
     "realm": "^12.8.0",
+    "sanitize-html": "^2.13.0",
     "socket.io-client": "^4.7.5"
   },
   "devDependencies": {
     "@babel/core": "^7.24.5",
     "@types/react": "~18.2.45",
+    "@types/sanitize-html": "^2.11.0",
     "typescript": "~5.3.3"
   },
   "private": true

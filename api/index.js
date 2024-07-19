@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const http = require('http');
 const socketIo = require('socket.io');
-const socketEvents = require('./socket');
+const socketEvents = require('./sockets');
 
 const app = express();
 const server = http.createServer(app);

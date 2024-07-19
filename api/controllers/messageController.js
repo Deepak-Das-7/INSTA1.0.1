@@ -1,8 +1,6 @@
-const express = require('express');
 const Messages = require('../models/messages');
-const router = express.Router();
 
-router.post('/send', async (req, res) => {
+exports.sendMessage = async (req, res) => {
     try {
         const { sender_id, receipent_id, text } = req.body;
         const savedMessage = await Messages.create({
@@ -12,15 +10,18 @@ router.post('/send', async (req, res) => {
             viewed: false,
             viewedAt: null
         });
+        
+        // Emit the message to all connected clients
+        req.app.io.emit('send:message', { sender_id, receipent_id, text });
+
         res.status(201).json(savedMessage);
     } catch (error) {
         console.error('Error sending message and inserting into the database:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-});
+};
 
-
-router.get('/conversation', async (req, res) => {
+exports.getConversation = async (req, res) => {
     try {
         const { sender_id, receipent_id } = req.query;
         const conversation = await Messages.find({
@@ -35,16 +36,16 @@ router.get('/conversation', async (req, res) => {
         console.error('Error fetching conversation:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-});
+};
 
-router.get('/seen', async (req, res) => {
+exports.markMessagesAsSeen = async (req, res) => {
     try {
         const { sender_id, receipent_id } = req.query;
         const conversation = await Messages.find({ sender_id, receipent_id }).sort({ createdAt: 1 });
         for (const message of conversation) {
             if (!message.viewed) {
                 message.viewed = true;
-                message.viewedAt = Date.now()
+                message.viewedAt = Date.now();
                 await message.save();
             }
         }
@@ -53,7 +54,4 @@ router.get('/seen', async (req, res) => {
         console.error('Error marking messages as viewed:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-});
-
-
-module.exports = router;
+};

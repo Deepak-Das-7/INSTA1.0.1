@@ -1,46 +1,97 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import { useSession } from '../../../../../UserContext';
-import { format, isToday } from 'date-fns';
-import { format as formatTZ } from 'date-fns-tz';
 import axios from 'axios';
+import MessageInput from '../../../../../components/MessageInput';
+import MessageGroup from '../../../../../components/MessageGroup';
+import io from 'socket.io-client';
+import sanitizeHtml from 'sanitize-html'; // Import sanitize-html library
 
 const Chat = () => {
     const user = useLocalSearchParams();
     const { userId } = useSession();
     const [message, setMessage] = useState("");
     const [conversation, setConversation] = useState([]);
+    const socket = useRef(null);
+    const flatListRef = useRef(null);
 
     useEffect(() => {
+        // Establish socket connection on component mount
+        socket.current = io('http://192.168.31.86:8000');
+
+        // Event listener for receiving messages
+        socket.current.on('receiveMessage', handleReceiveMessage);
+
+        // Fetch initial conversation and mark messages as viewed
         fetchConversation();
-        goToEnd("First timeeeeeeeeee");
         markAllMessagesAsViewed();
+
+        // Cleanup function: disconnect socket when component unmounts
+        return () => {
+            if (socket.current) {
+                socket.current.disconnect();
+            }
+        };
     }, []);
+
     useEffect(() => {
-        goToEnd("Second timeeeeeeeeee");
+        // Scroll to end of chat when conversation updates
+        goToEnd("Conversation updated");
     }, [conversation]);
 
-    const flatListRef = useRef<FlatList<{ id: string; text: string }> | null>(null);
+    // Function to handle receiving a new message from socket
+    const handleReceiveMessage = (newMessage) => {
+        if (newMessage.sender_id === user.user_id || newMessage.receipent_id === user.user_id) {
+            setConversation((prevConversation) => {
+                // Check if the new message already exists in any group
+                let messageExists = false;
+                const updatedConversation = prevConversation.map((group) => {
+                    if (group.msgs.some((msg) => msg._id === newMessage._id)) {
+                        messageExists = true;
+                        return {
+                            ...group,
+                            msgs: group.msgs.map((msg) => (msg._id === newMessage._id ? newMessage : msg)),
+                        };
+                    } else {
+                        return group;
+                    }
+                });
 
-    const goToEnd = async (test) => {
-        console.log(test);
-        try {
-            if (flatListRef.current) {
-                setTimeout(() => {
-                    flatListRef.current.scrollToEnd({ animated: true });
-                }, 10);
-            }
-        } catch (error) {
-            console.error('Error going downwards:', error);
+                // If the message is new, add it to the latest group or create a new group
+                if (!messageExists) {
+                    const latestGroup = updatedConversation[updatedConversation.length - 1];
+                    if (latestGroup && latestGroup.date === new Date(newMessage.createdAt).toISOString().split('T')[0]) {
+                        latestGroup.msgs.push(newMessage);
+                    } else {
+                        updatedConversation.push({
+                            date: new Date(newMessage.createdAt).toISOString().split('T')[0],
+                            msgs: [newMessage],
+                        });
+                    }
+                }
+
+                return groupMessagesByDate(updatedConversation.flat());
+            });
+            goToEnd("New message received");
         }
-    }
+    };
 
+    // Function to scroll to end of chat
+    const goToEnd = (message) => {
+        console.log(message);
+        if (flatListRef.current) {
+            setTimeout(() => {
+                flatListRef.current.scrollToEnd({ animated: true });
+            }, 100); // Adjust timeout if needed
+        }
+    };
+
+    // Function to group messages by date
     const groupMessagesByDate = (messages) => {
         const grouped = {};
         messages.forEach((msg) => {
-            const date = format(new Date(msg.createdAt), 'yyyy-MM-dd');
+            const date = new Date(msg.createdAt).toISOString().split('T')[0];
             if (!grouped[date]) {
                 grouped[date] = [];
             }
@@ -49,54 +100,7 @@ const Chat = () => {
         return Object.entries(grouped).map(([date, msgs]) => ({ date, msgs }));
     };
 
-    const renderMessageGroup = ({ item }) => {
-        const { date, msgs } = item;
-        const formattedDate = isToday(new Date(date)) ? 'Today' : format(new Date(date), 'dd/MM/yyyy');
-
-        return (
-            <View>
-                <Text style={styles.dateText}>{formattedDate}</Text>
-                {msgs.map((msg) => {
-                    const createdAtDate = new Date(msg.createdAt);
-                    const formattedTime = formatTZ(createdAtDate, 'hh:mm a');
-                    const isSentByMe = msg.sender_id === userId.user_id;
-                    const messageContainerStyle = {
-                        alignSelf: isSentByMe ? 'flex-end' : 'flex-start',
-                        backgroundColor: isSentByMe ? '#942AFF' : '#333333',
-                    };
-
-                    return (
-                        <View key={msg._id} style={{ marginBottom: 10, alignItems: isSentByMe ? 'flex-end' : 'flex-start' }}>
-                            <View
-                                style={[
-                                    styles.messageContainer,
-                                    messageContainerStyle,
-                                    { maxWidth: `90%` },
-                                ]}
-                            >
-                                <Text style={styles.messageText}>{msg.text}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: isSentByMe ? 'flex-end' : 'flex-start' }}>
-                                <Text
-                                    style={{
-                                        color: '#969697',
-                                        fontSize: 8,
-                                        textAlign: isSentByMe ? 'right' : 'left',
-                                    }}
-                                >
-                                    {formattedTime}
-                                </Text>
-                                {isSentByMe && msg.viewed && (
-                                    <Ionicons name="checkmark-done" size={12} color="#29BA1A" style={styles.checkmark} />
-                                )}
-                            </View>
-                        </View>
-                    );
-                })}
-            </View>
-        );
-    };
-
+    // Function to fetch initial conversation
     const fetchConversation = async () => {
         try {
             if (!user._id || !userId.user_id) {
@@ -125,37 +129,51 @@ const Chat = () => {
         }
     };
 
-    const sendMessage = async () => {
-        try {
-            if (!message) {
-                setMessage("Please type first then try to send OKAY!");
-                await new Promise(resolve => setTimeout(resolve, 500));
-                setMessage("");
-                return;
-            }
+// Function to send a new message
+const sendMessage = async () => {
+    try {
+        if (!message) {
+            setMessage("Please type first, then try to send.");
+            await new Promise(resolve => setTimeout(resolve, 500));
+            setMessage("");
+            return;
+        }
 
-            const response = await axios.post('http://192.168.31.86:8000/messages/send', {
-                sender_id: userId.user_id,
-                receipent_id: user.user_id,
-                text: message
-            });
-            if (response.status === 201) {
-                console.log(`
-                    Message sent successfully!
-                    From: ${userId.username}
-                    To: ${user.username}
-                    Message: ${message}
-                `);
-                setMessage("");
-                fetchConversation();
-            } else {
-                console.error('Failed to send message');
-            }
-        } catch (error) {
+        const createdAt = new Date().toISOString(); // Ensure createdAt is correctly formatted
+        console.log('Sending message with createdAt:', createdAt);
+
+        const newMessage = {
+            sender_id: userId.user_id,
+            receipent_id: user.user_id,
+            text: sanitizeInput(message), // Sanitize message input
+            createdAt: createdAt,
+        };
+
+        const response = await axios.post('http://192.168.31.86:8000/messages/send', newMessage);
+        if (response.status === 201) {
+            console.log(`
+                Message sent successfully!
+                From: ${userId.username}
+                To: ${user.username}
+                Message: ${message}
+            `);
+            setMessage("");
+            socket.current.emit('sendMessage', newMessage); // Emit the message to the server
+        } else {
+            console.error('Failed to send message');
+        }
+    } catch (error) {
+        if (error instanceof RangeError && error.message === 'Date value out of bounds') {
+            console.error('Date value out of bounds error:', error);
+            // Additional error handling specific to date issues
+        } else {
             console.error('Error sending message:', error);
         }
-    };
+    }
+};
 
+
+    // Function to mark all messages as viewed
     const markAllMessagesAsViewed = async () => {
         try {
             const response = await axios.get('http://192.168.31.86:8000/messages/seen', {
@@ -173,27 +191,31 @@ const Chat = () => {
             console.error('Error marking messages as viewed:', error);
         }
     };
+
+    // Function to sanitize HTML inputs using sanitize-html library
+    const sanitizeInput = (input) => {
+        return sanitizeHtml(input, {
+            allowedTags: [],
+            allowedAttributes: {},
+        });
+    };
+
     return (
         <View style={styles.container}>
             <FlatList
                 ref={flatListRef}
                 data={conversation}
-                renderItem={renderMessageGroup}
-                keyExtractor={(item) => item.date}
+                renderItem={({ item }) => <MessageGroup item={item} userId={userId} />}
+                keyExtractor={(item, index) => `message-group-${index}`} // Ensure keys are unique
                 onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
             />
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    value={message}
-                    onChangeText={(text) => setMessage(text)}
-                    placeholder={`Message ${user.username}`}
-                    placeholderTextColor="gray"
-                />
-                <TouchableOpacity onPress={sendMessage}>
-                    <Ionicons name="send-sharp" size={35} color="white" />
-                </TouchableOpacity>
-            </View>
+
+            <MessageInput
+                message={message}
+                setMessage={setMessage}
+                sendMessage={sendMessage}
+                username={user.username}
+            />
         </View>
     );
 };
@@ -204,39 +226,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         paddingHorizontal: 15,
         paddingTop: 10,
-    },
-    messageText: {
-        fontSize: 14,
-        color: 'white',
-    },
-    dateText: {
-        color: 'white',
-        fontSize: 12,
-        textAlign: 'center',
-        marginVertical: 10,
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderTopColor: '#D3D3D3',
-        paddingVertical: 10,
-    },
-    input: {
-        flex: 1,
-        borderRadius: 15,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        marginRight: 10,
-        fontSize: 16,
-        color: 'white',
-        backgroundColor: '#222222',
-    },
-    messageContainer: {
-        padding: 10,
-        borderRadius: 10,
-    },
-    checkmark: {
-        marginLeft: 5,
     },
 });
 
