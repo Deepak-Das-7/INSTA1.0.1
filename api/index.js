@@ -3,21 +3,19 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const http = require('http');
+const port = 3000;
+const env = require('../config');
 const socketIo = require('socket.io');
 const socketEvents = require('./sockets');
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
-
-const port = 8000;
-const mongoUri = "mongodb://localhost:27017/test";
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// MongoDB connection
+//==============DB connection========================
+const mongoUri = env.MONGODB_URI_1;
 mongoose
   .connect(mongoUri)
   .then(() => {
@@ -27,17 +25,16 @@ mongoose
     console.log("Error connecting to MongoDB:", error);
   });
 
-// Attach socket.io instance to req.app
+//======================================
+const server = http.createServer(app);
+const io = socketIo(server);
 app.io = io;
-
-// Initialize socket.io events
 socketEvents(io);
-
-// API routes setup
+//======================================
 const routes = require('./routes');
 app.use('/', routes);
 
-// Error handling middleware
+//==============Error handling middleware========================
 app.use((req, res, next) => {
   const error = new Error(`Not Found - ${req.originalUrl}`);
   error.status = 404;

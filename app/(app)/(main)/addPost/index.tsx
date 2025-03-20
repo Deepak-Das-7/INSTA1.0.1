@@ -3,6 +3,7 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, Image, Safe
 import { useSession } from '../../../../UserContext';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import env from '../../../../config';
 
 const addPost = () => {
     const { userId, setUserId } = useSession();
@@ -24,7 +25,7 @@ const addPost = () => {
                 return;
             }
 
-            const response = await fetch('http://192.168.31.86:8000/posts/add', {
+            const response = await fetch(`${env.API_BASE_URL}/posts/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

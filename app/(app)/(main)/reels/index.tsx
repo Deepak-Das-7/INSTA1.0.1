@@ -3,20 +3,19 @@ import { View, Text, Button, FlatList, Image } from 'react-native';
 import io from 'socket.io-client';
 import axios from 'axios';
 import { useSession } from '../../../../UserContext';
+import env from '../../../../config';
 
 
-const socket = io('http://192.168.31.86:8000');
+const socket = io(env.API_BASE_URL);
 
 const RealTimeUpdates = () => {
     const [updates, setUpdates] = useState([]);
     const [posts, setPosts] = useState([]);
-    const { userId } = useSession(); // Assuming useSession is a custom hook managing user session
+    const { userId } = useSession();
 
     useEffect(() => {
-        // Fetch posts initially
         fetchPosts();
 
-        // Socket.io event listener for updates
         socket.on('update', (update) => {
             setUpdates((prevUpdates) => [...prevUpdates, update]);
         });
@@ -28,8 +27,8 @@ const RealTimeUpdates = () => {
 
     const fetchPosts = async () => {
         try {
-            const response = await axios.get('http://192.168.31.86:8000/posts');
-            setPosts(response.data); // Assuming the response.data is an array of posts
+            const response = await axios.get(`${env.API_BASE_URL}/posts`);
+            setPosts(response.data);
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
@@ -37,7 +36,7 @@ const RealTimeUpdates = () => {
 
     const likeImage = async (postId) => {
         try {
-            await axios.post('http://192.168.31.86:8000/reaction/like', {
+            await axios.post(`${env.API_BASE_URL}/reaction/like`, {
                 userId: userId._id,
                 username: userId.username,
                 postId: postId,

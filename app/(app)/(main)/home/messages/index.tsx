@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useSession } from '../../../../../UserContext';
 import { router } from 'expo-router';
 import { formatTime } from '../../../../../calculator/time';
+import env from '../../../../../config';
 
 const ChatList = () => {
     const [users, setUsers] = useState([]);
@@ -11,16 +12,16 @@ const ChatList = () => {
 
     const fetchFriends = async () => {
         try {
-            const response = await axios.get(`http://192.168.31.86:8000/profile/friends/${userId.user_id}`);
+            const response = await axios.get(`${env.API_BASE_URL}/profile/friends/${userId.user_id}`);
             const friendsData = response.data;
 
             const usersWithLastMessage = await Promise.all(friendsData.map(async (user) => {
                 // Fetch user details including profile picture
-                const userDetailsResponse = await axios.get(`http://192.168.31.86:8000/profile/${user._id}`);
+                const userDetailsResponse = await axios.get(`${env.API_BASE_URL}/profile/${user._id}`);
                 const userDetails = userDetailsResponse.data;
 
                 // Fetch last message
-                const messageResponse = await axios.get('http://192.168.31.86:8000/messages/conversation', {
+                const messageResponse = await axios.get(`${env.API_BASE_URL}/messages/conversation`, {
                     params: {
                         sender_id: userId.user_id,
                         receipent_id: user._id,

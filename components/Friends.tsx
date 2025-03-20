@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import logoDas from '../assets/test.jpg';
 import { useSession } from '../UserContext';
 import axios from 'axios';
+import env from '../config';
 
 
 
@@ -22,7 +23,7 @@ const Friends = ({ item, handlePressProfile, handlePress }) => {
 
     const updateButtonStatus = async () => {
         try {
-            const response = await axios.get(`http://192.168.31.86:8000/profile/${you.user_id}`);
+            const response = await axios.get(`${env.API_BASE_URL}/profile/${you.user_id}`);
             const userData = response.data;
             if (userData.request_received.includes(userId.user_id)) {
                 setButtonText("Request Sent");

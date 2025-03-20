@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSession } from '../../../../UserContext';
 import { format, isToday } from 'date-fns';
 import axios from 'axios';
+import env from '../../../../config';
 
 
 
@@ -47,7 +48,7 @@ const chat = () => {
                 return;
             }
 
-            const response = await axios.get('http://192.168.31.86:8000/messages/conversation', {
+            const response = await axios.get(`${env.API_BASE_URL}/messages/conversation`, {
                 params: {
                     sender_id: userId.user_id,
                     receipent_id: user._id,
@@ -88,7 +89,7 @@ const chat = () => {
                 return;
             }
 
-            const response = await axios.post('http://192.168.31.86:8000/messages/send', {
+            const response = await axios.post(`${env.API_BASE_URL}/messages/send`, {
                 sender_id: userId.user_id,
                 receipent_id: user._id,
                 text: message

@@ -7,6 +7,8 @@ import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import { Modal } from 'react-native';
 import { formatDate } from '../calculator/dateFormat';
+import env from '../config';
+
 
 export default function Auth() {
     const [name, setName] = useState('');
@@ -32,7 +34,7 @@ export default function Auth() {
             password: password,
             profilePicture: "https://picsum.photos/600/300"
         };
-        axios.post("http://192.168.31.86:8000/auth/register", userData)
+        axios.post(`${env.API_BASE_URL}/auth/register`, userData)
             .then((response) => {
                 console.log(response.data.message);
                 Alert.alert("Registration Successful", "You have been registered successfully");
@@ -60,7 +62,7 @@ export default function Auth() {
             return;
         }
 
-        axios.post("http://192.168.31.86:8000/auth/login", userData)
+        axios.post(`${env.API_BASE_URL}/auth/login`, userData)
             .then((response) => {
                 setUserId(response.data.data);
                 setLoading(false);
@@ -80,7 +82,7 @@ export default function Auth() {
     };
 
     const selectUser = () => {
-        axios.get("http://192.168.31.86:8000/user/allUser")
+        axios.get(`${env.API_BASE_URL}/user/allUser`)
             .then((response) => {
                 setAllUsers(response.data);
                 setSelect(!select);
